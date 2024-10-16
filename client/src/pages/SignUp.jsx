@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,7 @@ function SignUp() {
         setError(true);
         return;
       }
+      navigate("/");
     } catch (err) {
       setLoading(false);
       setError(true);
