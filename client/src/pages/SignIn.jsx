@@ -7,6 +7,7 @@ import {
   signInFailure,
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../component/OAuth";
 
 function SignIn() {
   const dispatch = useDispatch();
@@ -81,13 +82,12 @@ function SignIn() {
         >
           {loading ? "loading..." : "sign in"}
         </button>
+        <OAuth />
       </form>
       <div
         className="flex gap-2 mt-5
       onChange"
       >
-        {/* <button>continue with google</button> */}
-
         <p>Dont have an account?</p>
         <Link to={"/sign-up"}>
           <span className="text-blue-500"> Sign Up</span>

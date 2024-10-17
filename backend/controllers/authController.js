@@ -33,11 +33,11 @@ export const signIn = async (req, res, next) => {
     }
     //Token creation
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "3d",
+      expiresIn: "5d",
     });
-    //removing password from data(validuser._doc)
+    //excluding password from data =>(validuser._doc)
     const { password: userHashPassword, ...rest } = validUser._doc;
-    //sending token as a cookie
+    //sending a cookie JWT token
     res
       .cookie("access_token", token, {
         httpOnly: true,
@@ -48,5 +48,62 @@ export const signIn = async (req, res, next) => {
       .json(rest); //send everything except password
   } catch (err) {
     next(err);
+  }
+};
+
+export const googleSignIn = async (req, res, next) => {
+  try {
+    const { name, email, photo } = req.body;
+
+    const user = await User.findOne({ email });
+    if (user) {
+      // case: if email exists in DB
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "5d",
+      });
+      //Exclude password in reponse
+      const { password: userHashPassword, ...rest } = user._doc;
+      //send a cookie with JWT token
+      res.cookie("access-token", token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days
+      });
+
+      console.log(user);
+      res.status(200).json({ token, ...rest });
+    } else {
+      //case :if email doesn't exists
+      // generating a temporary password for the user
+      const generatedPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+      // Creating a unique username to avoid collisions
+      const userName =
+        name.split(" ").join("").toLowerCase() +
+        Math.floor(Math.random * 1000).toString();
+
+      const newUser = new User({
+        username: userName,
+        email,
+        password: hashedPassword,
+        profilePicture: photo,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "5d",
+      });
+      const { pasword: hashedGooglePassword, ...rest } = newUser._doc;
+
+      res.cookie("access-token", token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days
+      });
+
+      console.log(newUser);
+
+      res.status(201).json({ token, ...rest });
+    }
+  } catch (err) {
+    console.log("Error during Google Sign-in", err);
   }
 };
