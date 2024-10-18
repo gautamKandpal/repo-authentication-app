@@ -70,7 +70,8 @@ export const googleSignIn = async (req, res, next) => {
       });
 
       console.log(user);
-      res.status(200).json({ token, ...rest });
+      // res.status(200).json({ token, ...rest });
+      res.status(200).json(rest);
     } else {
       //case :if email doesn't exists
       // generating a temporary password for the user
@@ -80,7 +81,7 @@ export const googleSignIn = async (req, res, next) => {
       // Creating a unique username to avoid collisions
       const userName =
         name.split(" ").join("").toLowerCase() +
-        Math.floor(Math.random * 1000).toString();
+        Math.floor(Math.random() * 1000).toString();
 
       const newUser = new User({
         username: userName,
@@ -92,6 +93,7 @@ export const googleSignIn = async (req, res, next) => {
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
         expiresIn: "5d",
       });
+      //Exclude password in reponse
       const { pasword: hashedGooglePassword, ...rest } = newUser._doc;
 
       res.cookie("access-token", token, {
@@ -101,7 +103,8 @@ export const googleSignIn = async (req, res, next) => {
 
       console.log(newUser);
 
-      res.status(201).json({ token, ...rest });
+      // res.status(201).json({ token, ...rest });
+      res.status(201).json(rest);
     }
   } catch (err) {
     console.log("Error during Google Sign-in", err);
