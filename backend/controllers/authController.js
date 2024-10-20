@@ -32,9 +32,7 @@ export const signIn = async (req, res, next) => {
       return next(customErrorHandler(401, "Invalid credentials"));
     }
     //Token creation
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "5d",
-    });
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
     //excluding password from data =>(validuser._doc)
     const { password: userHashPassword, ...rest } = validUser._doc;
     //sending a cookie JWT token
@@ -58,9 +56,7 @@ export const googleSignIn = async (req, res, next) => {
     const user = await User.findOne({ email });
     if (user) {
       // case: if email exists in DB
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "5d",
-      });
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       //Exclude password in reponse
       const { password: userHashPassword, ...rest } = user._doc;
       //send a cookie with JWT token
@@ -94,9 +90,9 @@ export const googleSignIn = async (req, res, next) => {
         expiresIn: "5d",
       });
       //Exclude password in reponse
-      const { pasword: hashedGooglePassword, ...rest } = newUser._doc;
+      const { password: hashedGooglePassword, ...rest } = newUser._doc;
 
-      res.cookie("access-token", token, {
+      res.cookie("access_token", token, {
         httpOnly: true,
         expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days
       });

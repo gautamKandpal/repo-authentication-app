@@ -1,5 +1,6 @@
 import bcryptjs from "bcryptjs";
 import User from "../model/userModel.js";
+import { CURSOR_FLAGS } from "mongodb";
 
 export const userController = (req, res) => {
   res.json({
@@ -8,6 +9,9 @@ export const userController = (req, res) => {
 };
 
 export const updateUser = async (req, res, next) => {
+  console.log("req.user.id ==> ", req.user.id);
+  console.log("req.params.id ==> ", req.params.id);
+
   if (req.user.id !== req.params.id) {
     return res.status(401).json({
       message: "you can update only your account",
