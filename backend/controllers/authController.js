@@ -106,3 +106,9 @@ export const googleSignIn = async (req, res, next) => {
     console.log("Error during Google Sign-in", err);
   }
 };
+
+export const signOut = (req, res) => {
+  res.clearCookie("access_token").status(200).json({
+    message: "Signout Successfully",
+  });
+};
