@@ -10,6 +10,9 @@ import {
   updateUserStart,
   updateUserFailure,
   updateUserSuccess,
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
 } from "../redux/user/userSlice";
 import { app } from "../firebase";
 import axios from "axios";
@@ -60,6 +63,23 @@ function Profile() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await axios.delete(
+        `${process.env.REACT_APP_BACKEND_URL}/user/delete/${currentUser._id}`
+      );
+      const data = res.data;
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (err) {
+      dispatch(deleteUserFailure(err));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -152,7 +172,12 @@ function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
+        <span
+          onClick={handleDeleteAccount}
+          className="text-red-700 cursor-pointer"
+        >
+          Delete Account
+        </span>
         <span className="text-red-700 cursor-pointer">Sign out</span>
       </div>
 

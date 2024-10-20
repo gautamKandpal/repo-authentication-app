@@ -8,13 +8,13 @@ export const userController = (req, res) => {
   });
 };
 
-export const updateUser = async (req, res, next) => {
+export const updateUser = async (req, res) => {
   console.log("req.user.id ==> ", req.user.id);
   console.log("req.params.id ==> ", req.params.id);
 
   if (req.user.id !== req.params.id) {
     return res.status(401).json({
-      message: "you can update only your account",
+      message: "Cannot update account ",
     });
   }
 
@@ -43,5 +43,26 @@ export const updateUser = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  if (req.user.id !== req.params.id) {
+    return res.status(401).json({
+      message: "cannot delete account",
+    });
+  }
+
+  try {
+    const deleteAccount = await User.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      message: "User has been deleted successfully!",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "User not found",
+    });
   }
 };
